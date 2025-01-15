@@ -15,8 +15,10 @@ public class AuthenticationData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long authenticationId;
+
     @Column(name = "phone_number", unique = true)
-    private String PhoneNumber;
+    private String phoneNumber;
+
     @Column(name = "password")
-    private String Password;
+    private String password;
 }

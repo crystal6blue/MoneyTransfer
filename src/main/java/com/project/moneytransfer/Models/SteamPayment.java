@@ -1,6 +1,6 @@
 package com.project.moneytransfer.Models;
 
-import com.project.moneytransfer.Enums.CustomerType;
+import com.project.moneytransfer.Models.PaymentInterfice.Payments;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,13 +12,12 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Customer {
+public class SteamPayment implements Payments {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long customerId;
+    @Column(name = "payment_id")
+    private Long paymentId;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "customer_type")
-    private CustomerType customerType;
+    @Column(name = "login", updatable = false)
+    private String login;
 }

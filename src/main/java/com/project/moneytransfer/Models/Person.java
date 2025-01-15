@@ -21,25 +21,33 @@ public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long PersonID;
+    private Long personID;
+
     @Column(name = "last_name")
-    private String LastName;
+    private String lastName;
+
     @Column(name = "first_name")
-    private String FirstName;
+    private String firstName;
+
     @Column(name = "gender")
     @Enumerated(EnumType.STRING)
-    private Gender Gender;
+    private Gender gender;
+
     @Column(name = "date_of_birth")
     @DateTimeFormat(pattern = "dd-MM-yyyy")
-    private LocalDate DateOfBirth;
-    @Column(name = "email")
+    private LocalDate dateOfBirth;
+
+    @Column(name = "email", unique = true)
     @NaturalId
-    private String Email;
-    @Column(name = "phone_number")
+    private String email;
+
+    @Column(name = "phone_number", unique = true)
     @NaturalId
-    private String PhoneNumber;
+    private String phoneNumber;
+
     @Column(name = "address")
-    private String Address;
+    private String address;
+
     @Column(name = "picture_of_user")
     @Lob
     private Blob image;
