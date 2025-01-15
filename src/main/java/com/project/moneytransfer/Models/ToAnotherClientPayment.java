@@ -1,21 +1,23 @@
 package com.project.moneytransfer.Models;
 
-import com.project.moneytransfer.Models.PaymentInterfice.Payments;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.SQLUpdate;
 
+// To another client payment table
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class ToAnotherClientPayment implements Payments {
+public class ToAnotherClientPayment  {
+    // ID
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long paymentId;
 
+    // Phone number
+    // it won't be changed after initializing
     @Column(name = "phone_number", updatable = false)
     private String phoneNumber;
 }
