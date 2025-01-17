@@ -25,6 +25,6 @@ public class PhoneNumberPayment {
     private String phoneNumber;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "transaction_id", referencedColumnName = "transactionId")
+    @JoinColumn(name = "transaction_id")
     private Transaction transaction;
 }
