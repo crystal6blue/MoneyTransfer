@@ -15,7 +15,6 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
-@ToString
 public class Person {
     // The ID of a person
     @Id
@@ -71,6 +70,6 @@ public class Person {
     private AuthenticationData authenticationData;
 
     // Person can be customer(Only one)
-    @OneToOne(mappedBy = "person", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "person")
     private Customer customer;
 }

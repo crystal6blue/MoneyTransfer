@@ -23,4 +23,8 @@ public class PhoneNumberPayment {
     // it won't be changed after initializing
     @Column(name = "phone_number", updatable = false)
     private String phoneNumber;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "transaction_id", referencedColumnName = "transactionId")
+    private Transaction transaction;
 }

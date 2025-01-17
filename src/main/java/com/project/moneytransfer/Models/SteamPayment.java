@@ -23,4 +23,8 @@ public class SteamPayment {
     // it won't be changed after initializing
     @Column(name = "login", updatable = false)
     private String login;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "transaction_id", referencedColumnName = "transactionId")
+    private Transaction transaction;
 }

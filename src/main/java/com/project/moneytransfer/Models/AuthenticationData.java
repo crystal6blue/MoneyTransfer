@@ -30,6 +30,6 @@ public class AuthenticationData {
     private String password;
 
     // One Person can have only one authentication data and vice versa
-    @OneToOne(mappedBy = "authenticationData", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToOne(mappedBy = "authenticationData")
     private Person person;
 }

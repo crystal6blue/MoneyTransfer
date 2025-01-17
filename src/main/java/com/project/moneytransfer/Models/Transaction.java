@@ -1,6 +1,6 @@
 package com.project.moneytransfer.Models;
 
-import com.project.moneytransfer.Enums.PaymentTypes;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.project.moneytransfer.Enums.TransactionStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -35,11 +35,6 @@ public class Transaction {
     @Column(name = "amount")
     private BigDecimal Amount;
 
-    // Payment type
-    @Enumerated(EnumType.STRING)
-    @Column(name = "payment_type", updatable = false)
-    private PaymentTypes paymentType;
-
     // transaction_date
     @Column(name = "transaction_date")
     @CreatedDate
@@ -49,4 +44,16 @@ public class Transaction {
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     @JoinColumn(name = "account_id")
     private Account account;
+
+    @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private PhoneNumberPayment phoneNumberPayment;
+
+    @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private SteamPayment steamPayment;
+
+    @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private ToAnotherClientPayment toAnotherClientPayment;
 }
