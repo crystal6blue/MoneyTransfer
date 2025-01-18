@@ -2,8 +2,10 @@ package com.project.moneytransfer.Dto;
 
 import com.project.moneytransfer.Enums.AccountStatus;
 import com.project.moneytransfer.Enums.AccountType;
-import com.project.moneytransfer.Models.Customer;
 import lombok.Data;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Data
 public class AccountDto {
@@ -11,7 +13,11 @@ public class AccountDto {
 
     private AccountType accountType;
 
+    private BigDecimal currentBalance;
+
     private AccountStatus accountStatus;
 
-    private Customer customer;
+    private LocalDate dateOpened;
+
+    private LocalDate dateClosed;
 }

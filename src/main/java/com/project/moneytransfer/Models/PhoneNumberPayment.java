@@ -1,6 +1,7 @@
 package com.project.moneytransfer.Models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +25,11 @@ public class PhoneNumberPayment {
     @Column(name = "phone_number", updatable = false)
     private String phoneNumber;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "transaction_id")
     private Transaction transaction;
+
+    public PhoneNumberPayment(@Size(min = 10, max = 11) String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 }

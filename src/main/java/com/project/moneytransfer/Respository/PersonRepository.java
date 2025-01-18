@@ -7,4 +7,6 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     void deletePersonByPhoneNumber(String phoneNumber);
 
     Person findPersonByPhoneNumber(String phoneNumber);
+
+    Boolean existsPersonByPhoneNumber(String phoneNumber);
 }

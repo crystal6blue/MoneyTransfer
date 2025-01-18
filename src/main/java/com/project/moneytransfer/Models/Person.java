@@ -70,6 +70,7 @@ public class Person {
     private AuthenticationData authenticationData;
 
     // Person can be customer(Only one)
-    @OneToOne(mappedBy = "person")
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "customerId")
     private Customer customer;
 }

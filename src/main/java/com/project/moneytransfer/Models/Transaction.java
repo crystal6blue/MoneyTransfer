@@ -41,19 +41,16 @@ public class Transaction {
     private LocalDateTime transactionDate;
 
     // Many transaction can be related to one account
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
     private Account account;
 
     @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL)
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private PhoneNumberPayment phoneNumberPayment;
 
     @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL)
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private SteamPayment steamPayment;
 
     @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL)
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private ToAnotherClientPayment toAnotherClientPayment;
 }

@@ -67,12 +67,19 @@ public class Account {
         dateClosed = dateOpened.plusYears(6);
     }
 
+    @PreUpdate
+    protected void updateAccountStatus() {
+        if(LocalDate.now().isAfter(dateClosed)) {
+            accountStatus = AccountStatus.INACTIVE;
+        }
+    }
+
     // Customer can have multiple account. account can be related to one customer
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
     // We can use one account for many operations
-    @OneToMany(mappedBy = "account")
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
     private List<Transaction> transaction;
 }

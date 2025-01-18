@@ -1,6 +1,7 @@
 package com.project.moneytransfer.Models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +25,11 @@ public class SteamPayment {
     @Column(name = "login", updatable = false)
     private String login;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "transaction_id")
     private Transaction transaction;
+
+    public SteamPayment(@NotBlank String login) {
+        this.login = login;
+    }
 }

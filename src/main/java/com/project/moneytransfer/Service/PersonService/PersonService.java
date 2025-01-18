@@ -7,6 +7,7 @@ import com.project.moneytransfer.Request.RequestAddNewPerson;
 import com.project.moneytransfer.Respository.PersonRepository;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.io.ByteArrayResource;
@@ -33,16 +34,6 @@ public class PersonService implements IPersonService {
         personRepository.save(newPerson);
     }
 
-    @Override
-    public PersonDto getPersonById(Long personId) {
-        return modelMapper.map(findPersonById(personId), PersonDto.class);
-    }
-
-    private Person findPersonById(Long personId) {
-        return personRepository.findById(personId)
-                .orElseThrow(() -> new ResourceNotFoundException("Person not found"));
-    }
-
     private Person createPersonRequest(RequestAddNewPerson person){
         Person newPerson = new Person();
         newPerson.setLastName(person.getLastName());
@@ -56,7 +47,17 @@ public class PersonService implements IPersonService {
     }
 
     @Override
-    public Person findPersonByPhoneNumber(String phoneNumber) {
+    public PersonDto getPersonById(Long personId) {
+        return modelMapper.map(findPersonById(personId), PersonDto.class);
+    }
+
+    public Person findPersonById(Long personId) {
+        return personRepository.findById(personId)
+                .orElseThrow(() -> new ResourceNotFoundException("Person with id " + personId + "not found"));
+    }
+
+    @Override
+    public Person findPersonByPhoneNumber(@Size(min = 10, max = 11) String phoneNumber) {
         return Optional.of(personRepository.findPersonByPhoneNumber(phoneNumber))
                 .orElseThrow(() -> new ResourceNotFoundException("Such person doesn't exist"));
     }
@@ -65,12 +66,14 @@ public class PersonService implements IPersonService {
     public void setEmail(Long personId,@Email String email) {
         Person person = findPersonById(personId);
         person.setEmail(email);
+        personRepository.save(person);
     }
 
     @Override
     public void setAddress(Long personId,@NotBlank String address) {
         Person person = findPersonById(personId);
         person.setAddress(address);
+        personRepository.save(person);
     }
 
     @Override
@@ -92,6 +95,7 @@ public class PersonService implements IPersonService {
         Person person = findPersonById(personId);
         try {
             person.setImage(new SerialBlob(image.getBytes()));
+            personRepository.save(person);
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
         }

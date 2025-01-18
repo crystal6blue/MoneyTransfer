@@ -1,6 +1,7 @@
 package com.project.moneytransfer.Models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 // To another client payment table
@@ -21,7 +22,11 @@ public class ToAnotherClientPayment  {
     @Column(name = "phone_number", updatable = false)
     private String phoneNumber;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "transaction_id")
     private Transaction transaction;
+
+    public ToAnotherClientPayment(@NotBlank String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 }

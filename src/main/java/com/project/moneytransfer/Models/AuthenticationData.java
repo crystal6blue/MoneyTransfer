@@ -1,15 +1,12 @@
 package com.project.moneytransfer.Models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.NaturalId;
 
 
 // Authentication data for a Person
-@AllArgsConstructor
+@RequiredArgsConstructor
 @NoArgsConstructor
 @Setter
 @Getter
@@ -23,10 +20,12 @@ public class AuthenticationData {
     // Phone number always must be unique
     @Column(name = "phone_number", unique = true)
     @NaturalId
+    @NonNull
     private String phoneNumber;
 
     // Password for user
     @Column(name = "password")
+    @NonNull
     private String password;
 
     // One Person can have only one authentication data and vice versa
