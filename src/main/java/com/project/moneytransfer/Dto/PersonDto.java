@@ -5,6 +5,8 @@ import com.project.moneytransfer.Enums.Gender;
 import java.time.LocalDate;
 
 public class PersonDto {
+
+    private Long personId;
     // Last name
     private String lastName;
 

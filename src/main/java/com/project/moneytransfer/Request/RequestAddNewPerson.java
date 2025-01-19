@@ -2,7 +2,7 @@ package com.project.moneytransfer.Request;
 
 import com.project.moneytransfer.Enums.Gender;
 import com.project.moneytransfer.Models.AuthenticationData;
-import com.project.moneytransfer.Models.Customer;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -13,14 +13,14 @@ import java.time.LocalDate;
 @Data
 public class RequestAddNewPerson {
     // Last name
-    @NotEmpty
+    @NotBlank
     private String lastName;
 
     // First name
-    @NotEmpty
+    @NotBlank
     private String firstName;
 
-    // Gender
+    // Gender enum
     // Male, Female
     @NotNull
     private Gender gender;
@@ -38,8 +38,4 @@ public class RequestAddNewPerson {
     // Every person has its own single authentication data
     @NotNull
     private AuthenticationData authenticationData;
-
-    // Person can be customer(Only one)
-    @NotNull
-    private Customer customer;
 }

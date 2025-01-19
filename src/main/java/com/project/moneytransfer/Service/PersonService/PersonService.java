@@ -41,7 +41,6 @@ public class PersonService implements IPersonService {
         newPerson.setDateOfBirth(person.getDateOfBirth());
         newPerson.setGender(person.getGender());
         newPerson.setPhoneNumber(person.getPhoneNumber());
-        newPerson.setCustomer(person.getCustomer());
         newPerson.setAuthenticationData(person.getAuthenticationData());
         return newPerson;
     }

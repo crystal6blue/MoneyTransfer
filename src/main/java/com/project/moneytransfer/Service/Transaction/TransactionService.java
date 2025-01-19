@@ -70,15 +70,18 @@ public class TransactionService implements ITransactionService {
                 newTransaction.setTransactionStatus(TransactionStatus.DECLINED);
             }else{
                 Person person = personRepository.findPersonByPhoneNumber(transaction.getPhoneNumberPayment().getPhoneNumber());
-                if(person.getCustomer() != null){
+                if(person.getCustomer() == null){
                     throw new ResourceNotFoundException("Customer not found, create a customer first");
                 }
                 Account account = person.getCustomer().getAccountList()
                         .stream().filter(account1 -> account1.getAccountType() == AccountType.MAIN)
                         .findFirst()
                         .orElse(accountService.createAccount(person.getCustomer().getCustomerId()));
+                if(account.getAccountStatus() == AccountStatus.INACTIVE) {
+                    throw new InvalidRequestException("the another client account is inactive");
+                }
                 account.setCurrentBalance(account.getCurrentBalance().add(transaction.getAmount()));
-
+                accountRepository.save(account);
                 newTransaction.setTransactionStatus(TransactionStatus.COMPLETED);
             }
         }else{

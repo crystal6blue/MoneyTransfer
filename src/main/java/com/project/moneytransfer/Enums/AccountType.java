@@ -6,6 +6,5 @@ package com.project.moneytransfer.Enums;
 // or main, where all money will come to
 public enum AccountType {
     MAIN,
-    BONUS_CARD,
     ORDINARY
 }

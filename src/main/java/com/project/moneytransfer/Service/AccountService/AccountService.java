@@ -4,6 +4,7 @@ import com.project.moneytransfer.Dto.AccountDto;
 import com.project.moneytransfer.Dto.TransactionDto;
 import com.project.moneytransfer.Enums.AccountStatus;
 import com.project.moneytransfer.Enums.AccountType;
+import com.project.moneytransfer.Exceptions.InvalidRequestException;
 import com.project.moneytransfer.Exceptions.ResourceNotFoundException;
 import com.project.moneytransfer.Models.Account;
 import com.project.moneytransfer.Models.Customer;
@@ -15,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,6 +45,26 @@ public class AccountService implements IAccountService {
         createAccount(customerId);
     }
 
+    @Override
+    public void blockAccount(Long accountId) {
+        Account account = getAccountById(accountId);
+        if(account.getAccountStatus() == AccountStatus.INACTIVE){
+            throw new InvalidRequestException("Account with id " + accountId + " is already blocked");
+        }
+        account.setAccountStatus(AccountStatus.INACTIVE);
+        accountRepository.save(account);
+    }
+
+    @Override
+    public void unblockAccount(Long accountId) {
+        Account account = getAccountById(accountId);
+        if(account.getAccountStatus() == AccountStatus.ACTIVE){
+            throw new InvalidRequestException("Account with id " + accountId + " is already unblocked");
+        }
+        account.setAccountStatus(AccountStatus.ACTIVE);
+        accountRepository.save(account);
+    }
+
     public Account createAccount(Long customerId) {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(()-> new ResourceNotFoundException("Customer with id " + customerId + " not found"));
@@ -63,22 +84,11 @@ public class AccountService implements IAccountService {
     }
 
     @Override
-    public void updateAccountStatus(Long accountId, AccountStatus status) {
-        Account account = getAccountById(accountId);
-        account.setAccountStatus(status);
-        accountRepository.save(account);
-    }
-
-    @Override
-    public void updateAccountBalance(Long accountId, BigDecimal amount) {
-        Account account = getAccountById(accountId);
-        account.setCurrentBalance(account.getCurrentBalance().add(amount));
-        accountRepository.save(account);
-    }
-
-    @Override
     public void updateAccountType(Long accountId, AccountType type) {
         Account account = getAccountById(accountId);
+        if(account.getAccountStatus() == AccountStatus.INACTIVE){
+            throw new InvalidRequestException("Account with id " + accountId + " is blocked");
+        }
         account.setAccountType(type);
         accountRepository.save(account);
     }
