@@ -15,8 +15,6 @@ public interface IAccountService {
 
     void unblockAccount(Long accountId);
 
-    void updateAccountType(Long accountId, AccountType accountType);
-
     List<TransactionDto> getTransactionsByAccountId(Long accountId);
 
     List<AccountDto> getAllAccounts();

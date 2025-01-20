@@ -70,27 +70,24 @@ public class AccountService implements IAccountService {
                 .orElseThrow(()-> new ResourceNotFoundException("Customer with id " + customerId + " not found"));
 
         Account newAccount = new Account();
-        newAccount.setAccountType(customerRepository.findById(customerId).get()
-                .getAccountList()
-                .stream().filter(account -> account.getAccountType()==AccountType.MAIN)
+
+        customer.getAccountList()
+                .stream()
+                .filter(account -> account.getAccountType() == AccountType.MAIN)
                 .findFirst()
-                        .map(account -> AccountType.ORDINARY)
-                .orElse(AccountType.MAIN));
+                .ifPresentOrElse(
+                        account -> newAccount.setAccountType(AccountType.ORDINARY),
+                        () -> newAccount.setAccountType(AccountType.MAIN)
+                );
+
         newAccount.setAccountStatus(AccountStatus.ACTIVE);
+        newAccount.setCustomer(customer);
 
         customer.getAccountList().add(newAccount);
-        customerRepository.save(customer);
-        return newAccount;
-    }
 
-    @Override
-    public void updateAccountType(Long accountId, AccountType type) {
-        Account account = getAccountById(accountId);
-        if(account.getAccountStatus() == AccountStatus.INACTIVE){
-            throw new InvalidRequestException("Account with id " + accountId + " is blocked");
-        }
-        account.setAccountType(type);
-        accountRepository.save(account);
+        customerRepository.save(customer);
+
+        return newAccount;
     }
 
     @Override

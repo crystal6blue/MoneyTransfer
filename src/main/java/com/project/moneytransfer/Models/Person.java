@@ -44,7 +44,6 @@ public class Person {
     // Email
     // Every person has their unique email
     @Column(name = "email", unique = true)
-    @NaturalId
     private String email;
 
     // Phone number

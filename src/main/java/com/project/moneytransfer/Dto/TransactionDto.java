@@ -5,11 +5,13 @@ import com.project.moneytransfer.Enums.TransactionStatus;
 import com.project.moneytransfer.Models.PhoneNumberPayment;
 import com.project.moneytransfer.Models.SteamPayment;
 import com.project.moneytransfer.Models.ToAnotherClientPayment;
+import lombok.Data;
 
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TransactionDto {
 
@@ -21,12 +23,9 @@ public class TransactionDto {
 
     private LocalDateTime transactionDate;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private PhoneNumberPayment phoneNumberPayment;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private SteamPayment steamPayment;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private ToAnotherClientPayment toAnotherClientPayment;
 }

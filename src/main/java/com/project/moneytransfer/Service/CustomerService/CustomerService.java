@@ -3,8 +3,10 @@ package com.project.moneytransfer.Service.CustomerService;
 import com.project.moneytransfer.Dto.AccountDto;
 import com.project.moneytransfer.Dto.CustomerDto;
 
+import com.project.moneytransfer.Dto.PersonDto;
 import com.project.moneytransfer.Enums.AccountStatus;
 import com.project.moneytransfer.Enums.CustomerStatus;
+import com.project.moneytransfer.Exceptions.AlreadyExistsException;
 import com.project.moneytransfer.Exceptions.ResourceNotFoundException;
 import com.project.moneytransfer.Models.Account;
 import com.project.moneytransfer.Models.Customer;
@@ -30,20 +32,32 @@ public class CustomerService implements ICustomerService {
     @Override
     public CustomerDto getCustomer(Long customerId) {
         return customerRepository.findById(customerId)
-                .map(this::getCustomerDto)
+                .map(customer -> {
+                    CustomerDto customerDto = getCustomerDto(customer);
+                    customerDto.setPersonDto(modelMapper.map(customer.getPerson(), PersonDto.class));
+                    return customerDto;
+                })
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
     }
 
     @Override
     public List<CustomerDto> getCustomers() {
         return customerRepository.findAll()
-                .stream().map(this::getCustomerDto)
+                .stream()
+                .map(customer -> {
+                    CustomerDto customerDto = getCustomerDto(customer);
+                    customerDto.setPersonDto(modelMapper.map(customer.getPerson(), PersonDto.class));
+                    return customerDto;
+                })
                 .collect(Collectors.toList());
     }
 
     @Override
     public void addCustomer(Long personId) {
         Person person = personService.findPersonById(personId);
+        if(person.getCustomer() != null) {
+            throw new AlreadyExistsException("Customer already exists");
+        }
         Customer customer = new Customer();
         customer.setCustomerStatus(CustomerStatus.ACTIVE);
         person.setCustomer(customer);

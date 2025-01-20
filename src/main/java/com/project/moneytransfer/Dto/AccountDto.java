@@ -3,7 +3,6 @@ package com.project.moneytransfer.Dto;
 import com.project.moneytransfer.Enums.AccountStatus;
 import com.project.moneytransfer.Enums.AccountType;
 import lombok.Data;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 

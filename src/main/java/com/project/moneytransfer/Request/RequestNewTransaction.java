@@ -1,5 +1,6 @@
 package com.project.moneytransfer.Request;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 import lombok.Data;
@@ -13,7 +14,7 @@ import java.math.BigDecimal;
 public class RequestNewTransaction {
 
     @NotNull
-    private BigDecimal Amount;
+    private BigDecimal amount;
 
     private PhoneNumberPaymentDto phoneNumberPayment;
 

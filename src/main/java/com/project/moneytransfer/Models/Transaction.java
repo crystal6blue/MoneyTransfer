@@ -26,6 +26,8 @@ public class Transaction {
     private Long transactionId;
 
     // Transaction status
+
+
     @Enumerated(EnumType.STRING)
     @Column(name = "transaction_status")
     private TransactionStatus transactionStatus;

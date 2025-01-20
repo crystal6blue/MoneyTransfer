@@ -46,30 +46,26 @@ public class Account {
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     @Column(name = "date_opened", updatable = false)
     @CreatedDate
-    private LocalDate dateOpened;
+    private LocalDate dateOpened = LocalDate.now();
 
     // It will store the time when this account will be INACTIVE
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     @Column(name = "date_closed", updatable = false)
-    private LocalDate dateClosed;
+    private LocalDate dateClosed = LocalDate.now().plusYears(6);
 
     // Account status
     // It will be stored as a string type
     @Enumerated(EnumType.STRING)
     @NonNull
-    @Column(name = "account_status")
+    @Column(name = "account_status", updatable = true)
     private AccountStatus accountStatus;
 
     // Automatically initializing date close after date open does
     // Every account's life span if 6 year
-    @PrePersist
-    protected void setDateClosed() {
-        dateClosed = dateOpened.plusYears(6);
-    }
 
     @PreUpdate
     protected void updateAccountStatus() {
-        if(LocalDate.now().isAfter(dateClosed)) {
+        if (dateClosed != null && LocalDate.now().isAfter(dateClosed)) {
             accountStatus = AccountStatus.INACTIVE;
         }
     }
