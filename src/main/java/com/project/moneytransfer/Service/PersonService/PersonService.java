@@ -3,6 +3,7 @@ package com.project.moneytransfer.Service.PersonService;
 import com.project.moneytransfer.Dto.PersonDto;
 import com.project.moneytransfer.Exceptions.InvalidRequestException;
 import com.project.moneytransfer.Exceptions.ResourceNotFoundException;
+import com.project.moneytransfer.Exceptions.SomethingHappenedToImageException;
 import com.project.moneytransfer.Models.Person;
 import com.project.moneytransfer.Request.RequestAddNewPerson;
 import com.project.moneytransfer.Request.RequestSetAddressToPerson;
@@ -115,7 +116,8 @@ public class PersonService implements IPersonService {
         if(person.getImage() == null){
             throw new ResourceNotFoundException("Image with person id " + personId + " not found");
         }
-        personRepository.deletePersonByPhoneNumber(person.getPhoneNumber());
+        person.setImage(null);
+        personRepository.save(person);
     }
 
     @Transactional
@@ -123,19 +125,15 @@ public class PersonService implements IPersonService {
     public ByteArrayResource getImageResource(Long personId) {
         Person person = findPersonById(personId);
         if (person.getImage() == null) {
-            log.error("Image with person id {} not found", personId);
+            throw new ResourceNotFoundException("No image found for person ID: " + personId);
         }
         Blob imageBlob = person.getImage();
-        if (imageBlob == null) {
-            log.error("No image found for person ID: {}", personId);
-        }
 
         try {
-            return new ByteArrayResource(person.getImage().getBytes(1, (int) person.getImage().length()));
+            return new ByteArrayResource(imageBlob.getBytes(1, (int) person.getImage().length()));
         } catch (SQLException e) {
-            log.error(new StringBuilder().append("Failed to fetch image data: ").append(e.getMessage()).toString());
+            throw new SomethingHappenedToImageException("Failed to fetch image data: : " + e.getMessage());
         }
-        return null;
     }
 
     private PersonDto convertToDto(Person person) {

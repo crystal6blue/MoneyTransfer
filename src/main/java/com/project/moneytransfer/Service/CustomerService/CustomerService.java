@@ -5,6 +5,7 @@ import com.project.moneytransfer.Dto.CustomerDto;
 
 import com.project.moneytransfer.Dto.PersonDto;
 import com.project.moneytransfer.Enums.AccountStatus;
+import com.project.moneytransfer.Enums.AccountType;
 import com.project.moneytransfer.Enums.CustomerStatus;
 import com.project.moneytransfer.Exceptions.AlreadyExistsException;
 import com.project.moneytransfer.Exceptions.ResourceNotFoundException;
@@ -59,8 +60,15 @@ public class CustomerService implements ICustomerService {
             throw new AlreadyExistsException("Customer already exists");
         }
         Customer customer = new Customer();
+
         customer.setCustomerStatus(CustomerStatus.ACTIVE);
+
+        Account account = new Account(AccountType.MAIN, AccountStatus.ACTIVE);
+        account.setCustomer(customer);
+        customer.getAccountList().add(account);
+
         person.setCustomer(customer);
+
         personRepository.save(person);
     }
 

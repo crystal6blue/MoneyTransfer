@@ -2,12 +2,12 @@ package com.project.moneytransfer.Models;
 
 import com.project.moneytransfer.Enums.CustomerStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Customer table
@@ -35,7 +35,6 @@ public class Customer {
 
     //One customer can have many account(up to 3)
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Size(min = 0, max = 3)
-    private List<Account> accountList;
+    private List<Account> accountList = new ArrayList<>();
 
 }

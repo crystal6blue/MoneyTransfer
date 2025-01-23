@@ -19,4 +19,6 @@ public class AccountDto {
     private LocalDate dateOpened;
 
     private LocalDate dateClosed;
+
+    private Long customerId;
 }

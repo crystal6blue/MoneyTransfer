@@ -2,7 +2,6 @@ package com.project.moneytransfer.Service.AccountService;
 
 import com.project.moneytransfer.Dto.AccountDto;
 import com.project.moneytransfer.Dto.TransactionDto;
-import com.project.moneytransfer.Enums.AccountType;
 
 import java.util.List;
 
@@ -18,4 +17,5 @@ public interface IAccountService {
     List<TransactionDto> getTransactionsByAccountId(Long accountId);
 
     List<AccountDto> getAllAccounts();
+
 }

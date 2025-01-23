@@ -30,9 +30,9 @@ public class AccountService implements IAccountService {
 
     @Override
     public AccountDto getAccount(Long accountId) {
-        Account account = accountRepository.findById(accountId)
+        return accountRepository.findById(accountId)
+                .map(this::getAccountDto)
                 .orElseThrow(()-> new ResourceNotFoundException("Account with id " + accountId + " not found"));
-        return getAccountDto(account);
     }
 
     public Account getAccountById(Long accountId) {
@@ -59,32 +59,27 @@ public class AccountService implements IAccountService {
     public void unblockAccount(Long accountId) {
         Account account = getAccountById(accountId);
         if(account.getAccountStatus() == AccountStatus.ACTIVE){
-            throw new InvalidRequestException("Account with id " + accountId + " is already unblocked");
+            throw new InvalidRequestException("the account with id " + accountId + " is already unblocked");
         }
         account.setAccountStatus(AccountStatus.ACTIVE);
         accountRepository.save(account);
     }
 
+
     public Account createAccount(Long customerId) {
         Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(()-> new ResourceNotFoundException("Customer with id " + customerId + " not found"));
+                .orElseThrow(()-> new ResourceNotFoundException("the customer with id " + customerId + " not found"));
 
-        Account newAccount = new Account();
+        if (customer.getAccountList().size() >= 3) {
+            throw new InvalidRequestException("Customer cannot have more than 3 accounts");
+        }
 
-        customer.getAccountList()
-                .stream()
-                .filter(account -> account.getAccountType() == AccountType.MAIN)
-                .findFirst()
-                .ifPresentOrElse(
-                        account -> newAccount.setAccountType(AccountType.ORDINARY),
-                        () -> newAccount.setAccountType(AccountType.MAIN)
-                );
+        Account newAccount = new Account(AccountType.ORDINARY, AccountStatus.ACTIVE);
 
-        newAccount.setAccountStatus(AccountStatus.ACTIVE);
         newAccount.setCustomer(customer);
-
         customer.getAccountList().add(newAccount);
 
+        accountRepository.save(newAccount);
         customerRepository.save(customer);
 
         return newAccount;
@@ -98,18 +93,25 @@ public class AccountService implements IAccountService {
                         .stream()
                         .map(this::getTransactionDto)
                         .collect(Collectors.toList()))
-                .orElseThrow(()-> new ResourceNotFoundException("Account with id " + accountId + " not found"));
+                .orElseThrow(()-> new ResourceNotFoundException("The account with id " + accountId + " not found"));
     }
 
     @Override
     public List<AccountDto> getAllAccounts() {
         return accountRepository.findAll()
-                .stream().map(this::getAccountDto).collect(Collectors.toList());
+                .stream().map(this::getAccountDto)
+                .collect(Collectors.toList());
     }
 
     private AccountDto getAccountDto(Account account) {
-        return modelMapper.map(account, AccountDto.class);
+        AccountDto accountDto = modelMapper.map(account, AccountDto.class);
+        accountDto.setCustomerId(account.getCustomer().getCustomerId());
+        return accountDto;
     }
 
-    private TransactionDto getTransactionDto(Transaction transaction) { return modelMapper.map(transaction, TransactionDto.class);}
+    private TransactionDto getTransactionDto(Transaction transaction) {
+        TransactionDto transactionDto = modelMapper.map(transaction, TransactionDto.class);
+        transactionDto.setAccountId(transaction.getAccount().getAccountId());
+        return transactionDto;
+    }
 }

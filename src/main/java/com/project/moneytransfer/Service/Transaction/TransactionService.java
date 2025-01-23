@@ -38,26 +38,28 @@ public class TransactionService implements ITransactionService {
                 .orElseThrow(()->new ResourceNotFoundException("Transaction not found"));
     }
 
+
     ///  -?- ???
     @Override
     public TransactionDto createTransaction(RequestNewTransaction transaction, Long accountId) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
-        Transaction newTransaction = getTransactionFromRequest(transaction);
+        Transaction newTransaction = getTransactionFromRequest(transaction, account);
 
         if(account.getAccountStatus() == AccountStatus.INACTIVE) {
             newTransaction.setTransactionStatus(TransactionStatus.FAILED);
-        } else if (account.getCurrentBalance().subtract(newTransaction.getAmount()).compareTo(BigDecimal.ZERO) < 0) {
+        } else if (newTransaction.getTransactionStatus() == TransactionStatus.DECLINED || account.getCurrentBalance().subtract(newTransaction.getAmount()).compareTo(BigDecimal.ZERO) < 0) {
             newTransaction.setTransactionStatus(TransactionStatus.DECLINED);
         }else{
             account.setCurrentBalance(account.getCurrentBalance().subtract(newTransaction.getAmount()));
         }
+        newTransaction.setAccount(account);
         account.getTransaction().add(newTransaction);
         accountRepository.save(account);
         return getTransactionDto(newTransaction);
     }
 
-    private Transaction getTransactionFromRequest(RequestNewTransaction transaction) {
+    private Transaction getTransactionFromRequest(RequestNewTransaction transaction, Account Oldaccount) {
         Transaction newTransaction = new Transaction();
         newTransaction.setAmount(transaction.getAmount());
         if(transaction.getPhoneNumberPayment() != null && transaction.getSteamPayment() == null && transaction.getToAnotherClientPayment() == null){
@@ -68,19 +70,23 @@ public class TransactionService implements ITransactionService {
             newTransaction.setTransactionStatus(TransactionStatus.COMPLETED);
         }else if(transaction.getPhoneNumberPayment() == null && transaction.getSteamPayment() == null && transaction.getToAnotherClientPayment() != null){
             newTransaction.setToAnotherClientPayment(new ToAnotherClientPayment(transaction.getToAnotherClientPayment().getPhoneNumber()));
-            if(!personRepository.existsPersonByPhoneNumber(transaction.getToAnotherClientPayment().getPhoneNumber())){
+            if(!personRepository.existsPersonByPhoneNumber(transaction.getToAnotherClientPayment().getPhoneNumber())
+                ||
+                    Oldaccount.getCustomer().getPerson().getPhoneNumber().equals(transaction.getToAnotherClientPayment().getPhoneNumber())
+            ){
                 newTransaction.setTransactionStatus(TransactionStatus.DECLINED);
             }else{
+
                 Person person = personRepository.findPersonByPhoneNumber(transaction.getToAnotherClientPayment().getPhoneNumber());
+
                 if(person.getCustomer() == null){
                     throw new ResourceNotFoundException("Customer not found, create a customer first");
                 }
                 Account account = person.getCustomer().getAccountList()
                         .stream().filter(account1 -> account1.getAccountType() == AccountType.MAIN)
-                        .findFirst()
-                        .orElseGet(() -> accountService.createAccount(person.getCustomer().getCustomerId()));
+                        .findFirst().get();
                 if(account.getAccountStatus() == AccountStatus.INACTIVE) {
-                    throw new InvalidRequestException("the another client account is inactive");
+                    throw new InvalidRequestException("the another client's account is inactive");
                 }
                 account.setCurrentBalance(account.getCurrentBalance().add(transaction.getAmount()));
                 accountRepository.save(account);
@@ -102,7 +108,29 @@ public class TransactionService implements ITransactionService {
                 .collect(Collectors.toList());
     }
 
-    public TransactionDto getTransactionDto(Transaction transaction) {
-        return modelMapper.map(transaction, TransactionDto.class);
+    @Override
+    public void transferMoneyBetweenAccounts(Long accountId_1, Long accountId_2, BigDecimal amount) {
+        Account account_1 = accountService.getAccountById(accountId_1);
+        Account account_2 = accountService.getAccountById(accountId_2);
+
+        if(account_1.getAccountStatus() == AccountStatus.INACTIVE) {
+            throw new InvalidRequestException("the client account is inactive");
+        }
+        if(account_1.getCurrentBalance().subtract(amount).compareTo(BigDecimal.ZERO) < 0) {
+            throw new ResourceNotFoundException("The current balance is not enough");
+        }
+        if(account_2.getAccountStatus() == AccountStatus.INACTIVE){
+            throw new InvalidRequestException("the another client account is inactive");
+        }
+        account_1.setCurrentBalance(account_1.getCurrentBalance().subtract(amount));
+        account_2.setCurrentBalance(account_2.getCurrentBalance().add(amount));
+        accountRepository.save(account_1);
+        accountRepository.save(account_2);
+    }
+
+    private TransactionDto getTransactionDto(Transaction transaction) {
+        TransactionDto transactionDto = modelMapper.map(transaction, TransactionDto.class);
+        transactionDto.setAccountId(transaction.getAccount().getAccountId());
+        return transactionDto;
     }
 }

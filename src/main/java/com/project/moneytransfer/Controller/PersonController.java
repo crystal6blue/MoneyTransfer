@@ -7,9 +7,7 @@ import com.project.moneytransfer.Request.RequestSetAddressToPerson;
 import com.project.moneytransfer.Request.RequestSetEmailToPerson;
 import com.project.moneytransfer.Response.ApiResponse;
 import com.project.moneytransfer.Service.PersonService.IPersonService;
-
 import jakarta.validation.Valid;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -21,9 +19,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.SQLException;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @RestController
 @RequestMapping("${api.prefix}/person")
@@ -49,27 +49,27 @@ public class PersonController {
     public ResponseEntity<ApiResponse> getAllPersons() {
         List<PersonDto> persons = personService.findAllPersons();
         if (persons.isEmpty()) {
-            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("No persons found", null));
+            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("No person found", null));
         }
-        return ResponseEntity.ok().body(new ApiResponse("Person successfully retrieved", persons));
+        return ResponseEntity.ok().body(new ApiResponse("Persons successfully retrieved", persons));
     }
 
     @GetMapping("/{phoneNumber}/findByPhoneNumber")
     public ResponseEntity<ApiResponse> findPersonByPhoneNumber(@PathVariable String phoneNumber) {
         PersonDto personDto = modelMapper.map(personService.findPersonByPhoneNumber(phoneNumber), PersonDto.class);
-        return ResponseEntity.ok().body(new ApiResponse("Person successfully retrieved", personDto));
+        return ResponseEntity.ok().body(new ApiResponse("Person successfully retrieved using PhoneNumber", personDto));
     }
 
     @PutMapping("/{personId}/setEmail")
     public ResponseEntity<ApiResponse> setEmail(@Valid @RequestBody RequestSetEmailToPerson email, @PathVariable Long personId) {
         personService.setEmail(personId, email);
-        return ResponseEntity.ok().body(new ApiResponse("Person successfully updated", null));
+        return ResponseEntity.ok().body(new ApiResponse("Person successfully updated(Email)", null));
     }
 
     @PutMapping("/{personId}/setAddress")
     public ResponseEntity<ApiResponse> setAddress(@Valid @RequestBody RequestSetAddressToPerson address, @PathVariable Long personId) {
         personService.setAddress(personId, address);
-        return ResponseEntity.ok().body(new ApiResponse("Person successfully updated", null));
+        return ResponseEntity.ok().body(new ApiResponse("Person successfully updated(Address)", null));
     }
 
     @DeleteMapping("/deletePerson")
@@ -81,21 +81,31 @@ public class PersonController {
     @PutMapping("/{personId}/setImage")
     public ResponseEntity<ApiResponse> setImage(@PathVariable Long personId, @RequestBody MultipartFile image) {
         personService.setImage(personId, image);
-        return ResponseEntity.ok().body(new ApiResponse("Persons successfully updated", null));
+        return ResponseEntity.ok().body(new ApiResponse("Person's picture successfully updated", null));
     }
 
     @DeleteMapping("/deleteImage")
     public ResponseEntity<ApiResponse> deleteImage(@RequestParam Long personId) {
         personService.deleteImage(personId);
-        return ResponseEntity.ok().body(new ApiResponse("Person successfully deleted", null));
+        return ResponseEntity.ok().body(new ApiResponse("Person's picture successfully deleted", null));
     }
 
     @GetMapping("/{personId}/getImageResource")
-    public ResponseEntity<Resource> getImageResource(@PathVariable Long personId) {
+    public ResponseEntity<Resource> getImageResource(@PathVariable Long personId) throws SQLException {
         ByteArrayResource resource = personService.getImageResource(personId);
         return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" +resource.getFilename() + "\"")
-                .body(resource);
+                .contentType(MediaType.IMAGE_JPEG).header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"").body(resource);
     }
+
+
 }
+
+
+
+
+
+
+
+
+
+

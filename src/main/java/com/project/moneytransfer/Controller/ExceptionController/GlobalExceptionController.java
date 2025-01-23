@@ -3,14 +3,15 @@ package com.project.moneytransfer.Controller.ExceptionController;
 import com.project.moneytransfer.Exceptions.AlreadyExistsException;
 import com.project.moneytransfer.Exceptions.InvalidRequestException;
 import com.project.moneytransfer.Exceptions.ResourceNotFoundException;
+import com.project.moneytransfer.Exceptions.SomethingHappenedToImageException;
 import com.project.moneytransfer.Response.ApiResponse;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -56,6 +57,12 @@ public class GlobalExceptionController {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiResponse> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        return ResponseEntity.status(BAD_REQUEST)
+                .body(new ApiResponse(ex.getMessage(), null));
+    }
+
+    @ExceptionHandler(SomethingHappenedToImageException.class)
+    public ResponseEntity<ApiResponse> handleSomethingHappenedToImageException(SomethingHappenedToImageException ex) {
         return ResponseEntity.status(BAD_REQUEST)
                 .body(new ApiResponse(ex.getMessage(), null));
     }

@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Data
 public class RequestAddNewPerson {
     // Last name
-    @NotBlank
+    @NotBlank(message = "aw")
     private String lastName;
 
     // First name

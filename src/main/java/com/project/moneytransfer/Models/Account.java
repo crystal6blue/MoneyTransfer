@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 // Account for a customer
@@ -57,7 +58,7 @@ public class Account {
     // It will be stored as a string type
     @Enumerated(EnumType.STRING)
     @NonNull
-    @Column(name = "account_status", updatable = true)
+    @Column(name = "account_status")
     private AccountStatus accountStatus;
 
     // Automatically initializing date close after date open does
@@ -72,10 +73,10 @@ public class Account {
 
     // Customer can have multiple account. account can be related to one customer
     @ManyToOne
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
     // We can use one account for many operations
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
-    private List<Transaction> transaction;
+    private List<Transaction> transaction  = new ArrayList<>();
 }

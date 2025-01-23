@@ -3,12 +3,9 @@ package com.project.moneytransfer.Controller;
 
 import com.project.moneytransfer.Dto.AccountDto;
 import com.project.moneytransfer.Dto.CustomerDto;
-import com.project.moneytransfer.Exceptions.AlreadyExistsException;
-import com.project.moneytransfer.Exceptions.ResourceNotFoundException;
 import com.project.moneytransfer.Response.ApiResponse;
 import com.project.moneytransfer.Service.CustomerService.ICustomerService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,65 +22,37 @@ public class CustomerController {
 
     @GetMapping("/{customerId}/get")
     public ResponseEntity<ApiResponse> getCustomer(@PathVariable Long customerId) {
-        try {
             CustomerDto customer= customerService.getCustomer(customerId);
-            return ResponseEntity.ok().body(new ApiResponse("Success", customer));
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), NOT_FOUND));
-        } catch (Exception e) {
-            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), INTERNAL_SERVER_ERROR));
-        }
+            return ResponseEntity.ok().body(new ApiResponse("The customer successfully retrieved", customer));
     }
 
     @GetMapping("/getAll")
     public ResponseEntity<ApiResponse> getCustomers() {
-        try {
             List<CustomerDto> customers= customerService.getCustomers();
             if(customers.isEmpty()){
-                return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("No customer found", NOT_FOUND));
+                return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("No data found", null));
             }
-            return ResponseEntity.ok().body(new ApiResponse("Success", customers));
-        } catch (Exception e) {
-            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), INTERNAL_SERVER_ERROR));
-        }
+            return ResponseEntity.ok().body(new ApiResponse("All customers retrieved successfully", customers));
     }
 
     @GetMapping("/{customerId}/getAllAccounts")
     public ResponseEntity<ApiResponse> getCustomerAccounts(@PathVariable Long customerId) {
-        try {
             List<AccountDto> accounts = customerService.getAccounts(customerId);
             if(accounts.isEmpty()){
-                return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("No account found", NOT_FOUND));
+                return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("No account found", null));
             }
-            return ResponseEntity.ok().body(new ApiResponse("Success", accounts));
-        } catch (Exception e) {
-            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), INTERNAL_SERVER_ERROR));
-        }
+            return ResponseEntity.ok().body(new ApiResponse("All the customer's accounts have been retrieved", accounts));
     }
 
     @PostMapping("/createCustomer")
-    public ResponseEntity<ApiResponse> addCustomer(@RequestParam Long personId){
-        try {
+    public ResponseEntity<ApiResponse> addCustomer(@RequestParam Long personId) {
             customerService.addCustomer(personId);
-            return ResponseEntity.status(CREATED).body(new ApiResponse("Success", null));
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), NOT_FOUND));
-        } catch (AlreadyExistsException e){
-            return ResponseEntity.status(HttpStatus.ALREADY_REPORTED).body(new ApiResponse(e.getMessage(), null));
-        } catch (Exception e) {
-            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), INTERNAL_SERVER_ERROR));
-        }
+            return ResponseEntity.status(CREATED).body(new ApiResponse("The customer with person id: " + personId + " successfully created", null));
     }
 
     @PutMapping("/blockCustomer")
     public ResponseEntity<ApiResponse> blockCustomer(@RequestParam Long customerId){
-        try {
             customerService.blockCustomer(customerId);
-            return ResponseEntity.status(OK).body(new ApiResponse("Success", null));
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), NOT_FOUND));
-        } catch (Exception e) {
-            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), INTERNAL_SERVER_ERROR));
-        }
+            return ResponseEntity.status(OK).body(new ApiResponse("The customer has successfully blocked", null));
     }
 }

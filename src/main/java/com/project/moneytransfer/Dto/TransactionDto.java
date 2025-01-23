@@ -23,6 +23,8 @@ public class TransactionDto {
 
     private LocalDateTime transactionDate;
 
+    private Long accountId;
+
     private PhoneNumberPayment phoneNumberPayment;
 
     private SteamPayment steamPayment;
