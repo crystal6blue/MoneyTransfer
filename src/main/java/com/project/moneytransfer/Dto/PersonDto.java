@@ -6,8 +6,8 @@ import lombok.Data;
 
 import java.time.LocalDate;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PersonDto {
 
     private Long personId;

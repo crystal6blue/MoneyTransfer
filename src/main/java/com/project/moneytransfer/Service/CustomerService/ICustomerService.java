@@ -7,6 +7,7 @@ import com.project.moneytransfer.Dto.CustomerDto;
 import java.util.List;
 
 public interface ICustomerService {
+
     CustomerDto getCustomer(Long customerId);
 
     List<CustomerDto> getCustomers();

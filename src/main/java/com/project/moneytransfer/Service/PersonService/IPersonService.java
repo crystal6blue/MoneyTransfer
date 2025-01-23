@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface IPersonService {
+
     void addNewPerson(RequestAddNewPerson person);
 
     PersonDto getPersonById(Long personId);

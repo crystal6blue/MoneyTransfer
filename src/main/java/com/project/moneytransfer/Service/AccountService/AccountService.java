@@ -24,49 +24,62 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class AccountService implements IAccountService {
+
     private final AccountRepository accountRepository;
+
     private final ModelMapper modelMapper;
+
     private final CustomerRepository customerRepository;
 
     @Override
     public AccountDto getAccount(Long accountId) {
+
         return accountRepository.findById(accountId)
-                .map(this::getAccountDto)
-                .orElseThrow(()-> new ResourceNotFoundException("Account with id " + accountId + " not found"));
+            .map(this::getAccountDto)
+            .orElseThrow(()-> new ResourceNotFoundException("Account with id " + accountId + " not found"));
     }
 
     public Account getAccountById(Long accountId) {
+
         return accountRepository.findById(accountId)
-                .orElseThrow(()-> new ResourceNotFoundException("Account with id " + accountId + " not found"));
+            .orElseThrow(()-> new ResourceNotFoundException("Account with id " + accountId + " not found"));
     }
 
     @Override
     public void addNewAccount(Long customerId) {
+
         createAccount(customerId);
     }
 
     @Override
     public void blockAccount(Long accountId) {
         Account account = getAccountById(accountId);
+
         if(account.getAccountStatus() == AccountStatus.INACTIVE){
             throw new InvalidRequestException("Account with id " + accountId + " is already blocked");
         }
+        
         account.setAccountStatus(AccountStatus.INACTIVE);
+
         accountRepository.save(account);
     }
 
     @Override
     public void unblockAccount(Long accountId) {
+
         Account account = getAccountById(accountId);
+
         if(account.getAccountStatus() == AccountStatus.ACTIVE){
             throw new InvalidRequestException("the account with id " + accountId + " is already unblocked");
         }
+
         account.setAccountStatus(AccountStatus.ACTIVE);
+
         accountRepository.save(account);
     }
 
 
-    public Account createAccount(Long customerId) {
+    public void createAccount(Long customerId) {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(()-> new ResourceNotFoundException("the customer with id " + customerId + " not found"));
 
@@ -81,8 +94,6 @@ public class AccountService implements IAccountService {
 
         accountRepository.save(newAccount);
         customerRepository.save(customer);
-
-        return newAccount;
     }
 
     @Override

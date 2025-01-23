@@ -25,9 +25,13 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CustomerService implements ICustomerService {
+
     private final CustomerRepository customerRepository;
+
     private final PersonRepository personRepository;
+
     private final PersonService personService;
+
     private final ModelMapper modelMapper;
 
     @Override
@@ -36,6 +40,7 @@ public class CustomerService implements ICustomerService {
                 .map(customer -> {
                     CustomerDto customerDto = getCustomerDto(customer);
                     customerDto.setPersonDto(modelMapper.map(customer.getPerson(), PersonDto.class));
+
                     return customerDto;
                 })
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
@@ -48,6 +53,7 @@ public class CustomerService implements ICustomerService {
                 .map(customer -> {
                     CustomerDto customerDto = getCustomerDto(customer);
                     customerDto.setPersonDto(modelMapper.map(customer.getPerson(), PersonDto.class));
+
                     return customerDto;
                 })
                 .collect(Collectors.toList());
@@ -56,9 +62,11 @@ public class CustomerService implements ICustomerService {
     @Override
     public void addCustomer(Long personId) {
         Person person = personService.findPersonById(personId);
+
         if(person.getCustomer() != null) {
             throw new AlreadyExistsException("Customer already exists");
         }
+
         Customer customer = new Customer();
 
         customer.setCustomerStatus(CustomerStatus.ACTIVE);
@@ -76,8 +84,10 @@ public class CustomerService implements ICustomerService {
     public void blockCustomer(Long customerId) {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
+
         customer.setCustomerStatus(CustomerStatus.BLOCKED);
         customer.getAccountList().forEach(account -> account.setAccountStatus(AccountStatus.INACTIVE));
+
         customerRepository.save(customer);
     }
 

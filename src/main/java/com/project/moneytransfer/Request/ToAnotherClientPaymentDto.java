@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class ToAnotherClientPaymentDto {
-    @NotBlank
+    @NotBlank(message = "Fill the phone number")
     private String phoneNumber;
 }

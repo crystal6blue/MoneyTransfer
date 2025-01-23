@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class SteamPaymentDto {
-    @NotBlank
+    @NotBlank(message = "Fill the login")
     private String login;
 }
 

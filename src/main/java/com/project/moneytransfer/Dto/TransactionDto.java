@@ -6,6 +6,7 @@ import com.project.moneytransfer.Models.PhoneNumberPayment;
 import com.project.moneytransfer.Models.SteamPayment;
 import com.project.moneytransfer.Models.ToAnotherClientPayment;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 
 import java.math.BigDecimal;
@@ -21,6 +22,7 @@ public class TransactionDto {
 
     private BigDecimal Amount;
 
+    @DateTimeFormat(pattern = "dd-MM-yyyy")
     private LocalDateTime transactionDate;
 
     private Long accountId;
@@ -30,4 +32,5 @@ public class TransactionDto {
     private SteamPayment steamPayment;
 
     private ToAnotherClientPayment toAnotherClientPayment;
+
 }

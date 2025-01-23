@@ -1,6 +1,5 @@
 package com.project.moneytransfer.Models;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.project.moneytransfer.Enums.TransactionStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,8 +25,6 @@ public class Transaction {
     private Long transactionId;
 
     // Transaction status
-
-
     @Enumerated(EnumType.STRING)
     @Column(name = "transaction_status")
     private TransactionStatus transactionStatus;
@@ -40,7 +37,7 @@ public class Transaction {
     // transaction_date
     @Column(name = "transaction_date")
     @CreatedDate
-    private LocalDateTime transactionDate;
+    private LocalDateTime transactionDate = LocalDateTime.now();
 
     // Many transaction can be related to one account
     @ManyToOne(fetch = FetchType.LAZY)

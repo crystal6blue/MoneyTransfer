@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class PhoneNumberPaymentDto {
-    @NotBlank
+    @NotBlank(message = "There is something wrong with phone number")
     private String phoneNumber;
 }

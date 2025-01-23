@@ -14,20 +14,20 @@ import java.time.LocalDate;
 @Data
 public class RequestAddNewPerson {
     // Last name
-    @NotBlank(message = "aw")
+    @NotBlank(message = "Write a last name with right way")
     private String lastName;
 
     // First name
-    @NotBlank
+    @NotBlank(message = "Write a first name with right way")
     private String firstName;
 
     // Gender enum
     // Male, Female
-    @NotNull
+    @NotNull(message = "Forget to fill gender")
     private Gender gender;
 
     // Date of Birth
-    @NotNull
+    @NotNull(message = "Write date with such format: DD.MM.YYYY")
     @JsonFormat(pattern = "dd.MM.yyyy")
     private LocalDate dateOfBirth;
 
@@ -42,7 +42,7 @@ public class RequestAddNewPerson {
 
     // Picture of a person
     // Every person has its own single authentication data
-    @NotNull
+    @NotNull(message = "Fill authentication data")
     @Valid
     private AuthenticationData authenticationData;
 }

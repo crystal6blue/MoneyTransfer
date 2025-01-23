@@ -12,6 +12,7 @@ import java.time.LocalDate;
 // Person table
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Getter
 @Setter
 @Entity
@@ -70,6 +71,6 @@ public class Person {
 
     // Person can be customer(Only one)
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "customerId")
+    @JoinColumn(name = "customer_id")
     private Customer customer;
 }

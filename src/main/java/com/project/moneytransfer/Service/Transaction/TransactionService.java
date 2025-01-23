@@ -25,25 +25,31 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class TransactionService implements ITransactionService {
+
     private final TransactionRepository transactionRepository;
+
     private final ModelMapper modelMapper;
+
     private final PersonRepository personRepository;
+
     private final AccountRepository accountRepository;
+
     private final AccountService accountService;
 
     @Override
     public TransactionDto getTransactionById(Long transactionId) {
+
         return transactionRepository.findById(transactionId)
                 .map(this::getTransactionDto)
                 .orElseThrow(()->new ResourceNotFoundException("Transaction not found"));
     }
 
-
-    ///  -?- ???
     @Override
     public TransactionDto createTransaction(RequestNewTransaction transaction, Long accountId) {
+
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+
         Transaction newTransaction = getTransactionFromRequest(transaction, account);
 
         if(account.getAccountStatus() == AccountStatus.INACTIVE) {
@@ -53,55 +59,83 @@ public class TransactionService implements ITransactionService {
         }else{
             account.setCurrentBalance(account.getCurrentBalance().subtract(newTransaction.getAmount()));
         }
+
         newTransaction.setAccount(account);
         account.getTransaction().add(newTransaction);
         accountRepository.save(account);
+
         return getTransactionDto(newTransaction);
     }
 
     private Transaction getTransactionFromRequest(RequestNewTransaction transaction, Account Oldaccount) {
+
         Transaction newTransaction = new Transaction();
         newTransaction.setAmount(transaction.getAmount());
+
         if(transaction.getPhoneNumberPayment() != null && transaction.getSteamPayment() == null && transaction.getToAnotherClientPayment() == null){
-            newTransaction.setPhoneNumberPayment(new PhoneNumberPayment(transaction.getPhoneNumberPayment().getPhoneNumber()));
-            newTransaction.setTransactionStatus(TransactionStatus.COMPLETED);
+
+            PhoneNumberPayment(transaction, newTransaction);
         }else if(transaction.getPhoneNumberPayment() == null && transaction.getSteamPayment() != null && transaction.getToAnotherClientPayment() == null){
-            newTransaction.setSteamPayment(new SteamPayment(transaction.getSteamPayment().getLogin()));
-            newTransaction.setTransactionStatus(TransactionStatus.COMPLETED);
+
+            SteamPayment(transaction, newTransaction);
         }else if(transaction.getPhoneNumberPayment() == null && transaction.getSteamPayment() == null && transaction.getToAnotherClientPayment() != null){
-            newTransaction.setToAnotherClientPayment(new ToAnotherClientPayment(transaction.getToAnotherClientPayment().getPhoneNumber()));
-            if(!personRepository.existsPersonByPhoneNumber(transaction.getToAnotherClientPayment().getPhoneNumber())
-                ||
-                    Oldaccount.getCustomer().getPerson().getPhoneNumber().equals(transaction.getToAnotherClientPayment().getPhoneNumber())
-            ){
-                newTransaction.setTransactionStatus(TransactionStatus.DECLINED);
-            }else{
 
-                Person person = personRepository.findPersonByPhoneNumber(transaction.getToAnotherClientPayment().getPhoneNumber());
-
-                if(person.getCustomer() == null){
-                    throw new ResourceNotFoundException("Customer not found, create a customer first");
-                }
-                Account account = person.getCustomer().getAccountList()
-                        .stream().filter(account1 -> account1.getAccountType() == AccountType.MAIN)
-                        .findFirst().get();
-                if(account.getAccountStatus() == AccountStatus.INACTIVE) {
-                    throw new InvalidRequestException("the another client's account is inactive");
-                }
-                account.setCurrentBalance(account.getCurrentBalance().add(transaction.getAmount()));
-                accountRepository.save(account);
-                newTransaction.setTransactionStatus(TransactionStatus.COMPLETED);
-            }
-        }else{
+            toAnotherClientPayment(transaction, newTransaction, Oldaccount);
+        } else{
             throw new InvalidRequestException("invalid request");
         }
+
         return newTransaction;
     }
 
+    private void PhoneNumberPayment(RequestNewTransaction transaction, Transaction newTransaction) {
+
+        newTransaction.setPhoneNumberPayment(new PhoneNumberPayment(transaction.getPhoneNumberPayment().getPhoneNumber()));
+        newTransaction.setTransactionStatus(TransactionStatus.COMPLETED);
+    }
+
+    private void SteamPayment(RequestNewTransaction transaction, Transaction newTransaction) {
+
+        newTransaction.setSteamPayment(new SteamPayment(transaction.getSteamPayment().getLogin()));
+        newTransaction.setTransactionStatus(TransactionStatus.COMPLETED);
+    }
+
+    private void toAnotherClientPayment(RequestNewTransaction transaction, Transaction newTransaction, Account Oldaccount) {
+
+        String phoneNumber = transaction.getPhoneNumberPayment().getPhoneNumber();
+
+        newTransaction.setToAnotherClientPayment(new ToAnotherClientPayment(phoneNumber));
+        if(     !personRepository.existsPersonByPhoneNumber(phoneNumber)
+                                                 ||
+                 Oldaccount.getCustomer().getPerson().getPhoneNumber().equals(phoneNumber)
+        ){
+
+            newTransaction.setTransactionStatus(TransactionStatus.DECLINED);
+        }else {
+
+            Person person = personRepository.findPersonByPhoneNumber(phoneNumber);
+
+            Account account = person.getCustomer()
+                    .getAccountList()
+                    .stream().filter(account1 -> account1.getAccountType() == AccountType.MAIN)
+                    .findFirst().orElseThrow(
+                            () -> new ResourceNotFoundException("Customer not found, create a customer first")
+                    );
+
+            if (account.getAccountStatus() == AccountStatus.INACTIVE) {
+                throw new InvalidRequestException("the another client's account is inactive");
+            }
+
+            account.setCurrentBalance(account.getCurrentBalance().add(transaction.getAmount()));
+            accountRepository.save(account);
+            newTransaction.setTransactionStatus(TransactionStatus.COMPLETED);
+        }
+    }
 
 
     @Override
     public List<TransactionDto> getAllTransactions() {
+
         return transactionRepository.findAll()
                 .stream()
                 .map(this::getTransactionDto)
@@ -110,6 +144,7 @@ public class TransactionService implements ITransactionService {
 
     @Override
     public void transferMoneyBetweenAccounts(Long accountId_1, Long accountId_2, BigDecimal amount) {
+
         Account account_1 = accountService.getAccountById(accountId_1);
         Account account_2 = accountService.getAccountById(accountId_2);
 
@@ -122,6 +157,7 @@ public class TransactionService implements ITransactionService {
         if(account_2.getAccountStatus() == AccountStatus.INACTIVE){
             throw new InvalidRequestException("the another client account is inactive");
         }
+
         account_1.setCurrentBalance(account_1.getCurrentBalance().subtract(amount));
         account_2.setCurrentBalance(account_2.getCurrentBalance().add(amount));
         accountRepository.save(account_1);
@@ -129,8 +165,10 @@ public class TransactionService implements ITransactionService {
     }
 
     private TransactionDto getTransactionDto(Transaction transaction) {
+
         TransactionDto transactionDto = modelMapper.map(transaction, TransactionDto.class);
         transactionDto.setAccountId(transaction.getAccount().getAccountId());
+
         return transactionDto;
     }
 }

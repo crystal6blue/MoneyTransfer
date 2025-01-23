@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PersonRepository extends JpaRepository<Person, Long> {
-    void deletePersonByPhoneNumber(String phoneNumber);
 
     @Query(value = "SELECT * FROM person p WHERE p.phone_number = ?1", nativeQuery = true)
     Person findPersonByPhoneNumber(String phoneNumber);

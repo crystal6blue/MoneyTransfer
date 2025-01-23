@@ -30,48 +30,56 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class PersonService implements IPersonService {
+
     private final PersonRepository personRepository;
+
     private final ModelMapper modelMapper;
 
     @Override
     public void addNewPerson(RequestAddNewPerson person) {
+
         Person newPerson = createPersonRequest(person);
         personRepository.save(newPerson);
     }
 
     private Person createPersonRequest(RequestAddNewPerson person){
+
         if(!person.getPhoneNumber().equals(person.getAuthenticationData().getPhoneNumber())){
             throw new InvalidRequestException("Person phone number does not match with authentication data");
         }
-        Person newPerson = new Person();
-        newPerson.setLastName(person.getLastName());
-        newPerson.setFirstName(person.getFirstName());
-        newPerson.setDateOfBirth(person.getDateOfBirth());
-        newPerson.setGender(person.getGender());
-        newPerson.setPhoneNumber(person.getPhoneNumber());
-        newPerson.setAuthenticationData(person.getAuthenticationData());
 
-        return newPerson;
+        return Person.builder()
+                .lastName(person.getLastName())
+                .firstName(person.getFirstName())
+                .dateOfBirth(person.getDateOfBirth())
+                .gender(person.getGender())
+                .phoneNumber(person.getPhoneNumber())
+                .authenticationData(person.getAuthenticationData())
+                .build();
     }
 
     @Override
     public PersonDto getPersonById(Long personId) {
+
         return modelMapper.map(findPersonById(personId), PersonDto.class);
     }
 
     public Person findPersonById(Long personId) {
+
         return personRepository.findById(personId)
                 .orElseThrow(() -> new ResourceNotFoundException("Person with id " + personId + " not found"));
     }
 
     @Override
     public Person findPersonByPhoneNumber(String phoneNumber) {
+
         return Optional.ofNullable(personRepository.findPersonByPhoneNumber(phoneNumber))
                 .orElseThrow(() -> new ResourceNotFoundException("Such person with phone number " + phoneNumber + " doesn't exist"));
     }
 
     @Override
     public void setEmail(Long personId, RequestSetEmailToPerson email) {
+
         Person person = findPersonById(personId);
         person.setEmail(email.email());
         personRepository.save(person);
@@ -79,6 +87,7 @@ public class PersonService implements IPersonService {
 
     @Override
     public void setAddress(Long personId, RequestSetAddressToPerson address) {
+
         Person person = findPersonById(personId);
         person.setAddress(address.address());
         personRepository.save(person);
@@ -86,6 +95,7 @@ public class PersonService implements IPersonService {
 
     @Override
     public List<PersonDto> findAllPersons() {
+
         return personRepository.findAll()
                 .stream()
                 .map(this::convertToDto)
@@ -94,28 +104,33 @@ public class PersonService implements IPersonService {
 
     @Override
     public void deletePerson(Long personId) {
+
         Person person = findPersonById(personId);
         personRepository.delete(person);
     }
 
     @Override
     public void setImage(Long personId, MultipartFile image) {
+
         Person person = findPersonById(personId);
         try {
             person.setImage(new SerialBlob(image.getBytes()));
             personRepository.save(person);
         } catch (SQLException | IOException e) {
-            throw new RuntimeException(e);
+            throw new SomethingHappenedToImageException(e.getMessage());
         }
     }
 
     @Transactional
     @Override
     public void deleteImage(Long personId) {
+
         Person person = findPersonById(personId);
+
         if(person.getImage() == null){
             throw new ResourceNotFoundException("Image with person id " + personId + " not found");
         }
+
         person.setImage(null);
         personRepository.save(person);
     }
@@ -123,10 +138,13 @@ public class PersonService implements IPersonService {
     @Transactional
     @Override
     public ByteArrayResource getImageResource(Long personId) {
+
         Person person = findPersonById(personId);
+
         if (person.getImage() == null) {
             throw new ResourceNotFoundException("No image found for person ID: " + personId);
         }
+
         Blob imageBlob = person.getImage();
 
         try {
@@ -137,6 +155,7 @@ public class PersonService implements IPersonService {
     }
 
     private PersonDto convertToDto(Person person) {
+
         return modelMapper.map(person, PersonDto.class);
     }
 }

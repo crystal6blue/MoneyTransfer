@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
-
 import static org.springframework.http.HttpStatus.*;
 
 @RestController
@@ -22,16 +21,18 @@ public class TransactionController {
 
     @GetMapping("/{transactionId}/get")
     public ResponseEntity<ApiResponse> getTransaction(@PathVariable Long transactionId) {
-            TransactionDto transactionDto = transactionService.getTransactionById(transactionId);
-            return ResponseEntity.status(OK)
-                    .body(new ApiResponse("The transaction has been successfully received", transactionDto));
+        TransactionDto transactionDto = transactionService.getTransactionById(transactionId);
+
+        return ResponseEntity.status(OK)
+            .body(new ApiResponse("The transaction has been successfully received", transactionDto));
     }
 
     @PostMapping("/{accountId}/createTransaction")
     public ResponseEntity<ApiResponse> createTransaction(@Valid @RequestBody RequestNewTransaction transaction, @PathVariable Long accountId) {
-            TransactionDto transactionDto = transactionService.createTransaction(transaction, accountId);
-            return ResponseEntity.status(CREATED)
-                    .body(new ApiResponse("The transaction has been successfully created", transactionDto));
+        TransactionDto transactionDto = transactionService.createTransaction(transaction, accountId);
+
+        return ResponseEntity.status(CREATED)
+            .body(new ApiResponse("The transaction has been successfully created", transactionDto));
     }
 
     @PostMapping("/transferMoneyBetweenAccounts")
@@ -40,17 +41,21 @@ public class TransactionController {
             @RequestParam Long accountId_2,
             @RequestParam BigDecimal amount){
         transactionService.transferMoneyBetweenAccounts(accountId_1, accountId_2, amount);
-        return ResponseEntity.status(OK).body(new ApiResponse("The money successfully has been transferred", null));
+
+        return ResponseEntity.status(OK)
+            .body(new ApiResponse("The money successfully has been transferred", null));
     }
 
     @GetMapping("/getAllTransactions")
     public ResponseEntity<ApiResponse> getAllTransactions(){
         List<TransactionDto> transactions = transactionService.getAllTransactions();
+
         if(transactions.isEmpty()){
             return ResponseEntity.status(NOT_FOUND)
-                    .body(new ApiResponse("NO DATA", null));
+                .body(new ApiResponse("NO DATA", null));
         }
+
         return ResponseEntity.status(OK)
-                .body(new ApiResponse("All transactions have been successfully received", transactions));
+            .body(new ApiResponse("All transactions have been successfully received", transactions));
     }
 }

@@ -6,6 +6,7 @@ import com.project.moneytransfer.Dto.TransactionDto;
 import java.util.List;
 
 public interface IAccountService {
+
     AccountDto getAccount(Long accountId);
 
     void addNewAccount(Long customerId);

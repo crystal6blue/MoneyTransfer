@@ -30,11 +30,11 @@ public class GlobalExceptionController {
                 .body(new ApiResponse(ex.getMessage(), null));
     }
 
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<ApiResponse> handleException(Exception ex) {
-//        return ResponseEntity.status(INTERNAL_SERVER_ERROR)
-//                .body(new ApiResponse(ex.getMessage(), null));
-//    }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse> handleException(Exception ex) {
+        return ResponseEntity.status(INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse(ex.getMessage(), null));
+    }
 
     @ExceptionHandler(AlreadyExistsException.class)
     public ResponseEntity<ApiResponse> handleAlreadyExistsException(AlreadyExistsException ex) {

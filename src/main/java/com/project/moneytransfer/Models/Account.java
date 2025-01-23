@@ -5,7 +5,6 @@ import com.project.moneytransfer.Enums.AccountType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.format.annotation.DateTimeFormat;
 
 
 import java.math.BigDecimal;
@@ -44,13 +43,11 @@ public class Account {
     private BigDecimal currentBalance = BigDecimal.ZERO;
 
     // This will store the time when account opened
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
     @Column(name = "date_opened", updatable = false)
     @CreatedDate
     private LocalDate dateOpened = LocalDate.now();
 
     // It will store the time when this account will be INACTIVE
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
     @Column(name = "date_closed", updatable = false)
     private LocalDate dateClosed = LocalDate.now().plusYears(6);
 
